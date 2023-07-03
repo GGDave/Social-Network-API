@@ -1,4 +1,4 @@
-const { User, Application } = require('../models');
+const { User, Thoughts } = require('../models');
 //replace all applications with thoughts
 module.exports = {
   // Get all users
