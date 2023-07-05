@@ -134,4 +134,56 @@ module.exports = {
       res.status(500).json(err);
     }
   },
+  async addReaction(req, res) {
+    try {
+      const reaction = {
+        reactionBody: req.body.reactionBody,
+        username: req.body.username,
+        userId: req.body.userId,
+      };
+      const thought = await Thoughts.findByIdAndUpdate(
+        req.params.thoughtId, // The id of the thought to which the reaction will be added.
+        { $addToSet: { reactions: reaction } }, // The reaction to add.
+        { new: true, runValidators: true } // Options: return the modified document rather than the original. runValidators ensures new reaction is valid.
+      );
+  
+      if (!thought) {
+        return res.status(404).json({ message: 'No thought with this ID' });
+      }
+  
+      res.json({ message: 'Reaction added successfully', thought });
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  },
+  async deleteReaction(req, res) {
+    try {
+      const thought = await Thoughts.findOneAndUpdate(
+        { _id: req.params.thoughtId }, 
+        { $pull: { reactions: { reactionId: req.params.reactionId } } }, 
+        { new: true }
+      );
+  
+      if (!thought) {
+        return res.status(404).json({ message: 'No thought found with this ID' });
+      }
+  
+      res.json({ message: 'Reaction deleted successfully', thought });
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  },
+  async getReactions(req, res) {
+    try {
+      const thought = await Thoughts.findById(req.params.thoughtId);
+      
+      if (!thought) {
+        return res.status(404).json({ message: 'No thought found with this ID' });
+      }
+      
+      res.json(thought.reactions);  // Return only reactions array
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  }
 };

@@ -1,5 +1,38 @@
-const { Schema, model } = require('mongoose');
+const { Schema, model, Types } = require('mongoose');
 const Tag = require('./Tags');
+
+// Create a new schema for the reaction
+const reactionSchema = new Schema(
+  {
+    reactionId: {
+      type: Schema.Types.ObjectId,
+      default: () => new Types.ObjectId()
+    },
+    reactionBody: {
+      type: String,
+      required: true,
+      maxlength: 280
+    },
+    username: {
+      type: String,
+      required: true
+    },
+    userId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    },
+  },
+  {
+    toJSON: {
+      getters: true
+    },
+    id: false,
+  }
+);
 
 // Schema to create Post model
 const thoughtsSchema = new Schema(
@@ -19,6 +52,7 @@ const thoughtsSchema = new Schema(
       default: Date.now,
     },
     tags: [Tag],
+    reactions: [reactionSchema] // new reactions field
   },
   {
     toJSON: {
@@ -28,12 +62,12 @@ const thoughtsSchema = new Schema(
   }
 );
 
-// Create a virtual property `getTags` that gets the amount of tags associated with a thought
+// Create a virtual property `getResponses` that gets the amount of reactions
 thoughtsSchema
-  .virtual('getResponses')
+  .virtual('ReactionsCount')
   // Getter
   .get(function () {
-    return this.tags.length;
+    return this.reactions.length;
   });
 
 // Initialize thoughts model
