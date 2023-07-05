@@ -85,4 +85,22 @@ module.exports = {
       res.status(500).json(err);
     }
   },
+  async deleteFriend(req, res) {
+    try {
+      const user = await User.findByIdAndUpdate(
+        req.params.userId, // The id of the user from whom the friend will be removed.
+        { $pull: { friends: req.params.friendId } }, // The id of the friend to remove.
+        { new: true, runValidators: true } // Options: return the modified document rather than the original. runValidators ensures friendId is a valid ObjectId.
+      );
+  
+      if (!user) {
+        return res.status(404).json({ message: 'No user with this ID' });
+      }
+  
+      res.json({ message: 'Friend removed successfully', user });
+      // res.json(user);
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  },
 };
