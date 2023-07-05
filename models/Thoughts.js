@@ -4,22 +4,19 @@ const Tag = require('./Tags');
 // Schema to create Post model
 const thoughtsSchema = new Schema(
   {
-    published: {
-      type: Boolean,
-      default: false,
+    thoughtText: {
+      type: String,
+      required: "Thought is Required",
+      minLength: 1,
+      maxLength: 280,
+    },
+    username: {
+      type: String,
+      required: true,
     },
     createdAt: {
       type: Date,
       default: Date.now,
-    },
-    buildSuccess: {
-      type: Boolean,
-      default: true,
-    },
-    description: {
-      type: String,
-      minLength: 15,
-      maxLength: 500,
     },
     tags: [Tag],
   },
@@ -31,7 +28,7 @@ const thoughtsSchema = new Schema(
   }
 );
 
-// Create a virtual property `getTags` that gets the amount of tags associated with an application
+// Create a virtual property `getTags` that gets the amount of tags associated with a thought
 thoughtsSchema
   .virtual('getResponses')
   // Getter
@@ -39,7 +36,7 @@ thoughtsSchema
     return this.tags.length;
   });
 
-// Initialize our Application model
+// Initialize thoughts model
 const Thoughts = model('thoughts', thoughtsSchema);
 
 module.exports = Thoughts;

@@ -6,6 +6,19 @@ const userSchema = new Schema(
     first: String,
     last: String,
     age: Number,
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
+    email: {
+      type: String,
+      required: "Email address is required",
+      unique: true,
+      match: [/.+\@.+\..+/, 'Must use a valid email address'],
+    },
+    
     thoughts: [
       {
         type: Schema.Types.ObjectId,
@@ -43,11 +56,15 @@ userSchema
     this.set({ first, last });
   });
 
+userSchema
+  .virtual('friendCount')
+  .get(function () {
+    return this.friends.length;
+  });  
 // Initialize our User model
 const User = model('User', userSchema);
 
 module.exports = User;
-
 // const { Schema, model } = require('mongoose');
 
 // // Schema to create User model
@@ -60,6 +77,12 @@ module.exports = User;
 //       {
 //         type: Schema.Types.ObjectId,
 //         ref: 'Thoughts',
+//       },
+//     ],
+//     friends: [
+//       {
+//         type: Schema.Types.ObjectId,
+//         ref: 'User',
 //       },
 //     ],
 //   },
@@ -88,6 +111,6 @@ module.exports = User;
 //   });
 
 // // Initialize our User model
-// const User = model('user', userSchema);
+// const User = model('User', userSchema);
 
 // module.exports = User;

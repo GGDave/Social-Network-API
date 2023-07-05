@@ -1,5 +1,5 @@
 const { User, Thoughts } = require('../models');
-//replace all applications with thoughts
+
 module.exports = {
   // Get all users
   async getUsers(req, res) {
@@ -35,7 +35,7 @@ module.exports = {
       res.status(500).json(err);
     }
   },
-  // Delete a user and associated apps
+  // Delete a user and associated thoughts
   async deleteUser(req, res) {
     try {
       const user = await User.findOneAndDelete({ _id: req.params.userId });
@@ -44,8 +44,8 @@ module.exports = {
         return res.status(404).json({ message: 'No user with that ID' });
       }
 
-      await Application.deleteMany({ _id: { $in: user.applications } });
-      res.json({ message: 'User and associated apps deleted!' })
+      await Thoughts.deleteMany({ _id: { $in: user.thoughts } });
+      res.json({ message: 'User and associated thoughts deleted!' })
     } catch (err) {
       res.status(500).json(err);
     }
@@ -71,7 +71,7 @@ module.exports = {
     try {
       const user = await User.findByIdAndUpdate(
         req.params.userId, // The id of the user to whom the friend will be added.
-        { $addToSet: { friends: req.body.friendId } }, // The id of the friend to add.
+        { $addToSet: { friends: req.params.friendId } }, // The id of the friend to add.
         { new: true, runValidators: true } // Options: return the modified document rather than the original. runValidators ensures new friendId is a valid ObjectId.
       );
   
@@ -79,7 +79,8 @@ module.exports = {
         return res.status(404).json({ message: 'No user with this ID' });
       }
   
-      res.json(user);
+      res.json({ message: 'Friend added successfully', user });
+      // res.json(user);
     } catch (err) {
       res.status(500).json(err);
     }
